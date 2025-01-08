@@ -1,6 +1,6 @@
 
 import httpx
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
 
 # Создаем APIRouter с префиксом "/user" и тегом 'user' для отображения в документации
 from starlette import status
@@ -8,6 +8,7 @@ from starlette import status
 from src.auth.auth import reg_user, authenticate_user, create_access_token
 from src.db.db import db_dependency
 from schemas.user import UserRegisterSchema, UserLoginSchema
+from src.api.v1.auth import has_role
 
 user_router = APIRouter(prefix="/user", tags=['user'])
 
@@ -45,3 +46,15 @@ async def login_for_access_token(db: db_dependency,
         data={"sub": {"email": user.email}}
     )
     return {"access_token": access_token, "token_type": "bearer"}
+
+
+def write_notification(email: str, message=""):
+    with open("log.txt", mode="w") as email_file:
+        content = f"notification for {email}: {message}"
+    email_file.write(content)
+
+
+@user_router.post("/send-notification/{email}", dependencies=[Depends(has_role(["admin"]))])
+async def send_notification(email: str, background_tasks: BackgroundTasks):
+    background_tasks.add_task(write_notification, email, message="some notification")
+    return {"message": "Notification sent in the background"}

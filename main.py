@@ -1,7 +1,11 @@
 import uvicorn
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, BackgroundTasks, HTTPException
+from fastapi.logger import logger
+from httpx import Request
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+
+from starlette.responses import JSONResponse
 
 from src.core.config import uvicorn_options
 
@@ -53,6 +57,23 @@ def my_put_func():
 @api_router.delete("/path")
 def my_delete_func():
     pass
+
+@app.exception_handler(Exception)
+async def exception(request: Request, exc: Exception):
+    logger.error(f"{request.url} | Error in application: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={"message": exc}
+    )
+
+
+@app.exception_handler(HTTPException)
+async def exception(request: Request, exc: HTTPException):
+    logger.error(f"{request.url} | Error in application: {exc}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"message": exc.detail}
+    )
 
 
 app.include_router(api_router)

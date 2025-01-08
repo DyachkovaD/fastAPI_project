@@ -77,8 +77,10 @@ async def reg_user(user_data: UserRegisterSchema, db: db_dependency):
 async def authenticate_user(login_data: UserLoginSchema, db: db_dependency):
     # делаем SELECT-запрос в базу данных для нахождения пользователя по email
     result = await db.execute(select(User)
+                              .options(joinedload(User.role))
                               .where(User.email == login_data.email))
     user: Optional[User] = result.scalars().first()
+
     # пользователь будет авторизован, если он зарегистрирован и ввёл корректный пароль
     if not user:
         return False
