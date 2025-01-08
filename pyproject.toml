@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "fastapi-proj"
+version = "0.1.0"
+description = ""
+authors = ["Darya Dyachkova <d.dyachkova@bk.ru>"]
+readme = "README.md"
+packages = [{include = "fastapi_proj"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pydantic-settings = "^2.7.1"
+fastapi = {extras = ["uvicorn"], version = "^0.115.6"}
+httpx = "^0.28.1"
+asyncpg = "^0.30.0"
+greenlet = "^3.1.1"
+sqlalchemy = "^2.0.36"
+alembic = "^1.14.0"
+pytest-asyncio = "^0.25.2"
+python-jose = {extras = ["cryptogrphy"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+bcrypt = "^4.2.1"
+pydantic = {extras = ["email"], version = "^2.10.4"}
+python-multipart = "^0.0.20"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
